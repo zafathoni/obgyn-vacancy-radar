@@ -1,8 +1,10 @@
 name: OBGYN Vacancy Radar
 
 on:
+  schedule:
+    - cron: '0 8 * * *'  # 15:00 WIB
   workflow_dispatch:
-
+    
 jobs:
   run:
     runs-on: ubuntu-latest
