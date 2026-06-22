@@ -18,7 +18,7 @@ payload = {
     "gl": "id",
     "hl": "id",
     "tbs": "qdr:w",
-    "num": 1
+    "num": 10
 }
 
 headers = {
@@ -29,6 +29,8 @@ headers = {
 # Menggunakan POST request sesuai dokumentasi Serper
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
+
+print(data)
 
 message = "🩺 HASIL PENCARIAN LOWONGAN OBGYN\n\n"
 
