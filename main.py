@@ -8,11 +8,11 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 url = "https://google.serper.dev/search"
 
 payload = {
-    "q": '(SpOG OR "Sp.OG" OR Obgyn OR OBGYN OR "dokter kandungan" OR "dokter spesialis kandungan dan kebidanan") (lowongan OR vacancy OR hiring OR dibutuhkan)',
+    "q": 'site:instagram.com/p/ (SpOG OR Obgyn OR "dokter kandungan") (lowongan OR vacancy OR hiring OR dibutuhkan)',
     "gl": "id",
     "hl": "id",
-    "tbs": "qdr:d",  # 24 jam terakhir
-    "num": 10
+    "tbs": "qdr:w",
+    "num": 50
 }
 
 headers = {
