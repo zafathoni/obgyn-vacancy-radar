@@ -1,19 +1,23 @@
+
 import os
 import requests
 
-SERPER_API_KEY = os.environ["SERPER_API_KEY"]
+# Pastikan SERPER_API_KEY sudah terdaftar di GitHub Secrets Anda
+SERPER_API_KEY = os.environ["SERPER_API_KEY"] 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
+# Query yang disesuaikan
+query = '("We are Hiring SpOG" OR "We are Hiring Obgyn" OR "We are Hiring dokter kandungan" OR "We are Hiring obstetri" OR "Lowongan Obgyn" OR "Lowongan dokter kandungan" OR "Vacancy Obgyn" OR "Vacancy dokter kandungan)',
+
 url = "https://google.serper.dev/search"
 
-# QUERY PALING STABIL UNTUK INSTAGRAM + SpOG
 payload = {
-    "q": '(SpOG OR Obgyn OR "dokter kandungan" OR "obstetri ginekologi") site:instagram.com',
+    "q": query,
     "gl": "id",
     "hl": "id",
     "tbs": "qdr:w",
-    "num": 30
+    "num": 10
 }
 
 headers = {
@@ -21,52 +25,25 @@ headers = {
     "Content-Type": "application/json"
 }
 
+# Menggunakan POST request sesuai dokumentasi Serper
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-# DEBUG (aktifkan kalau perlu troubleshooting)
-print("=== SERPER RAW RESPONSE ===")
-print(data)
-print("===========================")
+message = "🩺 HASIL PENCARIAN LOWONGAN OBGYN\n\n"
 
-message = "🩺 LOWONGAN DOKTER SpOG / OBGYN (INSTAGRAM TERBARU)\n\n"
-
-results = []
-
-for item in data.get("organic", []):
-
-    title = item.get("title", "")
-    link = item.get("link", "")
-    snippet = item.get("snippet", "")
-
-    text = f"{title} {snippet}".lower()
-
-    # FILTER RINGAN (jangan terlalu ketat)
-    if any(k in text for k in [
-        "spog",
-        "obgyn",
-        "obstetri",
-        "ginekologi",
-        "kandungan",
-        "hiring",
-        "we are hiring",
-        "join",
-        "vacancy",
-        "lowongan"
-    ]):
-
-        results.append(f"• {title}\n{link}\n")
-
-# fallback: kalau kosong, tetap tampilkan hasil mentah (biar tidak "kosong total")
-if results:
-    message += "\n".join(results[:10])
+# Serper menyimpan hasil di key 'organic'
+if "organic" in data and len(data["organic"]) > 0:
+    for item in data["organic"]:
+        title = item.get("title", "Tanpa Judul")
+        link = item.get("link", "#")
+        message += f"• {title}\n{link}\n\n"
 else:
-    message += "Tidak ditemukan hasil spesifik lowongan, berikut hasil umum:\n\n"
+    message += "Maaf, belum ada lowongan Obgyn yang ditemukan saat ini."
 
-    for item in data.get("organic", [])[:5]:
-        message += f"• {item.get('title')}\n{item.get('link')}\n\n"
-
+# Debugging log untuk GitHub Actions
+print("--- DEBUG MESSAGE START ---")
 print(message)
+print("--- DEBUG MESSAGE END ---")
 
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
