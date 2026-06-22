@@ -8,8 +8,8 @@ BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
 # Query yang disesuaikan
-query = "Hiring+SpOG" OR "Hiring+Obgyn" OR "Hiring+dokter+kandungan" OR "Hiring+obstetri" OR "Lowongan+Obgyn" OR "Lowongan+dokter+kandungan" OR "Vacancy+Obgyn" OR "Vacancy+dokter+kandungan"
-
+# query = "Hiring+SpOG" OR "Hiring+Obgyn" OR "Hiring+dokter+kandungan" OR "Hiring+obstetri" OR "Lowongan+Obgyn" OR "Lowongan+dokter+kandungan" OR "Vacancy+Obgyn" OR "Vacancy+dokter+kandungan"
+  query = "Hiring+Obgyn"
 url = "https://google.serper.dev/search"
 
 payload = {
