@@ -1,45 +1,58 @@
-
 import os
 import requests
 
-# Pastikan SERPER_API_KEY sudah terdaftar di GitHub Secrets Anda
-SERPER_API_KEY = os.environ["SERPER_API_KEY"] 
+SERPER_API_KEY = os.environ["SERPER_API_KEY"]
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-
-# Query yang disesuaikan
-query = "Lowongan Kerja Obgyn Jakarta"
 
 url = "https://google.serper.dev/search"
 
 payload = {
-    "q": query,
-    "num": 5
+    "q": '(SpOG OR "Sp.OG" OR Obgyn OR OBGYN OR "dokter kandungan" OR "dokter spesialis kandungan dan kebidanan") (lowongan OR vacancy OR hiring OR dibutuhkan)',
+    "gl": "id",
+    "hl": "id",
+    "tbs": "qdr:d",  # 24 jam terakhir
+    "num": 10
 }
+
 headers = {
     "X-API-KEY": SERPER_API_KEY,
     "Content-Type": "application/json"
 }
 
-# Menggunakan POST request sesuai dokumentasi Serper
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-message = "🩺 HASIL PENCARIAN LOWONGAN OBGYN\n\n"
+message = "🩺 LOWONGAN DOKTER KANDUNGAN / SpOG (24 JAM TERAKHIR)\n\n"
 
-# Serper menyimpan hasil di key 'organic'
-if "organic" in data and len(data["organic"]) > 0:
-    for item in data["organic"]:
-        title = item.get("title", "Tanpa Judul")
-        link = item.get("link", "#")
-        message += f"• {title}\n{link}\n\n"
+results = []
+
+for item in data.get("organic", []):
+    title = item.get("title", "")
+    snippet = item.get("snippet", "")
+    link = item.get("link", "")
+
+    text = f"{title} {snippet}".lower()
+
+    # Filter sederhana supaya lebih relevan
+    if any(k in text for k in [
+        "spog",
+        "sp.og",
+        "obgyn",
+        "dokter kandungan",
+        "kebidanan",
+        "ginekologi"
+    ]):
+        results.append(
+            f"• {title}\n{link}\n"
+        )
+
+if results:
+    message += "\n".join(results[:10])
 else:
-    message += "Maaf, belum ada lowongan Obgyn yang ditemukan saat ini."
+    message += "Tidak ditemukan lowongan baru yang relevan."
 
-# Debugging log untuk GitHub Actions
-print("--- DEBUG MESSAGE START ---")
 print(message)
-print("--- DEBUG MESSAGE END ---")
 
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
