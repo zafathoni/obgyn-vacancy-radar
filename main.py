@@ -7,12 +7,13 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
 url = "https://google.serper.dev/search"
 
+# QUERY PALING STABIL UNTUK INSTAGRAM + SpOG
 payload = {
-    "q": '(SpOG OR Obgyn OR "dokter kandungan" OR "obstetri ginekologi") (lowongan OR vacancy OR hiring OR recruitment)',
+    "q": '(SpOG OR Obgyn OR "dokter kandungan" OR "obstetri ginekologi") site:instagram.com',
     "gl": "id",
     "hl": "id",
     "tbs": "qdr:w",
-    "num": 20
+    "num": 30
 }
 
 headers = {
@@ -23,26 +24,47 @@ headers = {
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-message = "🩺 LOWONGAN DOKTER KANDUNGAN / SpOG\n\n"
+# DEBUG (aktifkan kalau perlu troubleshooting)
+print("=== SERPER RAW RESPONSE ===")
+print(data)
+print("===========================")
+
+message = "🩺 LOWONGAN DOKTER SpOG / OBGYN (INSTAGRAM TERBARU)\n\n"
 
 results = []
 
-print(data)
-
 for item in data.get("organic", []):
 
-    title = item.get("title", "Tanpa Judul")
+    title = item.get("title", "")
     link = item.get("link", "")
     snippet = item.get("snippet", "")
 
-    results.append(
-        f"• {title}\n{link}\n{snippet}\n"
-    )
+    text = f"{title} {snippet}".lower()
 
+    # FILTER RINGAN (jangan terlalu ketat)
+    if any(k in text for k in [
+        "spog",
+        "obgyn",
+        "obstetri",
+        "ginekologi",
+        "kandungan",
+        "hiring",
+        "we are hiring",
+        "join",
+        "vacancy",
+        "lowongan"
+    ]):
+
+        results.append(f"• {title}\n{link}\n")
+
+# fallback: kalau kosong, tetap tampilkan hasil mentah (biar tidak "kosong total")
 if results:
     message += "\n".join(results[:10])
 else:
-    message += "Tidak ditemukan lowongan baru."
+    message += "Tidak ditemukan hasil spesifik lowongan, berikut hasil umum:\n\n"
+
+    for item in data.get("organic", [])[:5]:
+        message += f"• {item.get('title')}\n{item.get('link')}\n\n"
 
 print(message)
 
