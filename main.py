@@ -43,6 +43,7 @@ if results:
 else:
     message += "Tidak ditemukan post Instagram yang relevan."
 
+print(data)
 print("--- DEBUG ---")
 print(message)
 
