@@ -8,7 +8,7 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 url = "https://google.serper.dev/search"
 
 payload = {
-    "q": 'site:instagram.com/p/ (SpOG OR Obgyn OR "dokter kandungan")',
+    "q": '(SpOG OR Obgyn OR "dokter kandungan" OR "obstetri ginekologi") (lowongan OR vacancy OR hiring OR recruitment)',
     "gl": "id",
     "hl": "id",
     "tbs": "qdr:w",
@@ -23,28 +23,27 @@ headers = {
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-message = "🩺 HASIL PENCARIAN SpOG / OBGYN INSTAGRAM\n\n"
+message = "🩺 LOWONGAN DOKTER KANDUNGAN / SpOG\n\n"
 
 results = []
+
+print(data)
 
 for item in data.get("organic", []):
 
     title = item.get("title", "Tanpa Judul")
     link = item.get("link", "")
+    snippet = item.get("snippet", "")
 
-    # Hanya ambil post Instagram
-    if "instagram.com/p/" in link:
-        results.append(
-            f"• {title}\n{link}\n"
-        )
+    results.append(
+        f"• {title}\n{link}\n{snippet}\n"
+    )
 
 if results:
     message += "\n".join(results[:10])
 else:
-    message += "Tidak ditemukan post Instagram yang relevan."
+    message += "Tidak ditemukan lowongan baru."
 
-print(data)
-print("--- DEBUG ---")
 print(message)
 
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
