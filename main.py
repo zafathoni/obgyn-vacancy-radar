@@ -1,38 +1,45 @@
+
 import os
 import requests
 
-API_KEY = os.environ["GOOGLE_API_KEY"]
-CX = os.environ["GOOGLE_CX"]
-
+# Pastikan SERPER_API_KEY sudah terdaftar di GitHub Secrets Anda
+SERPER_API_KEY = os.environ["SERPER_API_KEY"] 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-query = "dokter spesialis obgyn"
+# Query yang disesuaikan
+query = "Lowongan Kerja Obgyn Jakarta"
 
-url = "https://www.googleapis.com/customsearch/v1"
+url = "https://google.serper.dev/search"
 
-response = requests.get(
-    url,
-    params={
-        "key": API_KEY,
-        "cx": CX,
-        "q": query,
-        "num": 5
-    }
-)
+payload = {
+    "q": query,
+    "num": 5
+}
+headers = {
+    "X-API-KEY": SERPER_API_KEY,
+    "Content-Type": "application/json"
+}
 
+# Menggunakan POST request sesuai dokumentasi Serper
+response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-message = "🩺 TEST HASIL PENCARIAN\n\n"
+message = "🩺 HASIL PENCARIAN LOWONGAN OBGYN\n\n"
 
-if "items" in data:
-    for item in data["items"]:
-        title = item.get("title", "")
-        link = item.get("link", "")
-
+# Serper menyimpan hasil di key 'organic'
+if "organic" in data and len(data["organic"]) > 0:
+    for item in data["organic"]:
+        title = item.get("title", "Tanpa Judul")
+        link = item.get("link", "#")
         message += f"• {title}\n{link}\n\n"
 else:
-    message += str(data)
+    message += "Maaf, belum ada lowongan Obgyn yang ditemukan saat ini."
+
+# Debugging log untuk GitHub Actions
+print("--- DEBUG MESSAGE START ---")
+print(message)
+print("--- DEBUG MESSAGE END ---")
 
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
