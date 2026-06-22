@@ -8,11 +8,11 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 url = "https://google.serper.dev/search"
 
 payload = {
-    "q": 'site:instagram.com/p/ (SpOG OR Obgyn OR "dokter kandungan") (lowongan OR vacancy OR hiring OR dibutuhkan)',
+    "q": 'site:instagram.com/p/ (SpOG OR Obgyn OR "dokter kandungan")',
     "gl": "id",
     "hl": "id",
     "tbs": "qdr:w",
-    "num": 50
+    "num": 20
 }
 
 headers = {
@@ -23,26 +23,17 @@ headers = {
 response = requests.post(url, json=payload, headers=headers)
 data = response.json()
 
-message = "🩺 LOWONGAN DOKTER KANDUNGAN / SpOG (24 JAM TERAKHIR)\n\n"
+message = "🩺 HASIL PENCARIAN SpOG / OBGYN INSTAGRAM\n\n"
 
 results = []
 
 for item in data.get("organic", []):
-    title = item.get("title", "")
-    snippet = item.get("snippet", "")
+
+    title = item.get("title", "Tanpa Judul")
     link = item.get("link", "")
 
-    text = f"{title} {snippet}".lower()
-
-    # Filter sederhana supaya lebih relevan
-    if any(k in text for k in [
-        "spog",
-        "sp.og",
-        "obgyn",
-        "dokter kandungan",
-        "kebidanan",
-        "ginekologi"
-    ]):
+    # Hanya ambil post Instagram
+    if "instagram.com/p/" in link:
         results.append(
             f"• {title}\n{link}\n"
         )
@@ -50,8 +41,9 @@ for item in data.get("organic", []):
 if results:
     message += "\n".join(results[:10])
 else:
-    message += "Tidak ditemukan lowongan baru yang relevan."
+    message += "Tidak ditemukan post Instagram yang relevan."
 
+print("--- DEBUG ---")
 print(message)
 
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
