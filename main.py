@@ -17,6 +17,7 @@ payload = {
     "q": query,
     "gl": "id",
     "hl": "id",
+    "location": "Indonesia",
     "tbs": "qdr:w",
     "num": 10
 }
