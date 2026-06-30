@@ -1,4 +1,3 @@
-```python
 import os
 import json
 import requests
@@ -211,4 +210,3 @@ requests.post(
         "disable_web_page_preview": True
     }
 )
-```
